@@ -15,6 +15,7 @@ namespace Task_8.Controllers
         public ActionResult Get(string inputLine, int sortOption)
         {
             string badRequestLine;
+            IConfiguration jsonConfig = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
             ResultData resultData = new ResultData();
 
             if (!Regex.IsMatch(inputLine, "^[a-z]+$"))
@@ -29,7 +30,16 @@ namespace Task_8.Controllers
                     badRequestLine = "Строка не должна быть пустой!";
                 }
                 return BadRequest(badRequestLine);
+            }
 
+            if (jsonConfig.GetSection("Settings:BlackList").Get<string[]>().Any(str => str == inputLine))
+            {
+                badRequestLine = $"'{inputLine}' находится в черном списке: ";
+                foreach (string str in jsonConfig.GetSection("Settings:BlackList").Get<string[]>())
+                {
+                    badRequestLine += str + ", ";
+                }
+                return BadRequest(badRequestLine);
             }
 
             char[] mainLine = inputLine.ToCharArray();
@@ -70,11 +80,6 @@ namespace Task_8.Controllers
                 }
             }
 
-            //if (maxLine == "")
-            //{
-                //return BadRequest("Подстроки, которая начинется и заканчивается на гласную букву, НЕТ, в данной строке!");
-            //}
-
             resultData.LongSubline = maxLine;
 
             if (sortOption != 1 && sortOption != 2)
@@ -96,11 +101,10 @@ namespace Task_8.Controllers
                 resultData.SortResultLine = new string(treesort.TreeSort(resultLineChars));
             }
 
-            string postApiRandom = $"http://www.randomnumberapi.com/api/v1.0/random?min={0}&max={resultLine.Length}&count=100";
             int delIndex;
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(postApiRandom);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(jsonConfig.GetSection("RandomApi").Get<string>() + $"?min=0&max={resultLine.Length}&count=1");
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
