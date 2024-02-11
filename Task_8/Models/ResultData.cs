@@ -1,4 +1,4 @@
-﻿namespace Task_7.Models
+﻿namespace Task_8.Models
 {
     public class ResultData
     {

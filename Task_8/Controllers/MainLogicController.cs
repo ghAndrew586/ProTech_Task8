@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text.RegularExpressions;
-using Task_7.Models;
-using Task_7.SortingAlgorithms;
+using Task_8.Models;
+using Task_8.SortingAlgorithms;
 
-namespace Task_7.Controllers
+namespace Task_8.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
